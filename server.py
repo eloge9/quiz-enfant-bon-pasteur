@@ -1,12 +1,13 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import time
+import json
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins=["http://192.168.137.1:5501", "http://localhost:63342",
-                                               "http://localhost:5000"])
+socketio = SocketIO(app, cors_allowed_origins=["http://192.168.0.107:5501", "http://localhost:63342",
+                                               "http://localhost:5000", "http://192.168.0.107:5000"])
 
 buzzed_team = None
 time_limit = 10
@@ -24,6 +25,50 @@ timer_thread = None
 answer_timer_thread = None
 timer_running = False
 
+# Stockage des questions (en production, utilisez une vraie base de données)
+questions = []
+current_question_index = -1
+quiz_active = False
+
+# Route admin
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+# Fonctionnalités de gestion
+@app.route('/admin/questions', methods=['GET', 'POST'])
+def manage_questions():
+    global questions
+    if request.method == 'POST':
+        question = request.get_json()
+        questions.append(question)
+        return jsonify({'message': 'Question ajoutée avec succès'}), 201
+    else:
+        return jsonify(questions)
+
+@app.route('/admin/questions/<int:index>', methods=['GET', 'PUT', 'DELETE'])
+def manage_question(index):
+    global questions
+    if request.method == 'GET':
+        if index < len(questions):
+            return jsonify(questions[index])
+        else:
+            return jsonify({'message': 'Question non trouvée'}), 404
+    elif request.method == 'PUT':
+        question = request.get_json()
+        if index < len(questions):
+            questions[index] = question
+            return jsonify({'message': 'Question mise à jour avec succès'})
+        else:
+            return jsonify({'message': 'Question non trouvée'}), 404
+    elif request.method == 'DELETE':
+        if index < len(questions):
+            del questions[index]
+            return jsonify({'message': 'Question supprimée avec succès'})
+        else:
+            return jsonify({'message': 'Question non trouvée'}), 404
+
+# ... (le reste du code reste inchangé)
 
 def reset_timers():
     global current_time, current_answer_time, buzzed_team, timer_running
@@ -39,9 +84,54 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/phone')
+def phone():
+    return render_template('phone.html')
+
+
+@socketio.on('add_question')
+def handle_add_question(data):
+    global questions
+    questions.append(data)
+    emit('questions_list', {'questions': questions}, broadcast=True)
+
+@socketio.on('delete_question')
+def handle_delete_question(data):
+    global questions
+    questions = [q for q in questions if q.get('id') != data.get('id')]
+    emit('questions_list', {'questions': questions}, broadcast=True)
+
+@socketio.on('get_questions')
+def handle_get_questions():
+    emit('questions_list', {'questions': questions})
+
+@socketio.on('start_quiz')
+def handle_start_quiz(data):
+    global quiz_active, questions
+    quiz_active = True
+    emit('quiz_started', broadcast=True)
+
+@socketio.on('pause_quiz')
+def handle_pause_quiz():
+    global quiz_active
+    quiz_active = False
+    emit('quiz_paused', broadcast=True)
+
+@socketio.on('reset_quiz')
+def handle_reset_quiz():
+    global quiz_active, current_question_index
+    quiz_active = False
+    current_question_index = -1
+    emit('quiz_reset', broadcast=True)
+
+@socketio.on('reveal_answer')
+def handle_reveal_answer(data):
+    emit('answer_revealed', data, broadcast=True)
+
 @socketio.on('connect')
 def handle_connect():
-    print('Client connecté')
+    print('Client connecté - SID:', request.sid)
+    print('Origin:', request.environ.get('HTTP_ORIGIN', 'Unknown'))
 
 
 @socketio.on('buzz')

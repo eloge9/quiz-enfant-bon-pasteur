@@ -1,0 +1,50 @@
+/* Animations supplémentaires pour le quiz */
+
+@keyframes buzzGlow {
+    0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6); }
+    100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+}
+
+@keyframes scorePopup {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+@keyframes teamWin {
+    0% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(5deg); }
+    50% { transform: scale(1.2) rotate(-5deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.buzzed-team.buzzed {
+    animation: buzzGlow 1s ease-in-out infinite;
+}
+
+.score.updated {
+    animation: scorePopup 0.5s ease-out;
+}
+
+.team-section.winner {
+    animation: teamWin 1s ease-in-out;
+}
+
+/* Amélioration du bouton buzzer */
+.buzzer-button.buzz-active {
+    animation: pulse 0.3s ease-in-out;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4) !important;
+}
+
+/* Timer amélioré */
+.timer-bar.warning {
+    background: linear-gradient(90deg, #ff6b6b, #ffd93d) !important;
+    animation: buzzGlow 0.5s ease-in-out infinite;
+}
+
+.timer-bar.danger {
+    background: linear-gradient(90deg, #ff4757, #ff6348) !important;
+    animation: buzzGlow 0.3s ease-in-out infinite;
+}

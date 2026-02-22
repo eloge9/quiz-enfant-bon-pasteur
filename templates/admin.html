@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <h1><i class="fas fa-cogs"></i> Panneau d'Administration</h1>
+        </header>
+
+        <div class="main-content">
+            <!-- Section Question -->
+            <section class="section">
+                <h2><i class="fas fa-question-circle"></i> Question Actuelle</h2>
+
+                <div class="question-display">
+                    <div id="question-text" class="question-text">
+                        Chargement de la première question...
+                    </div>
+
+                    <!-- Affichage pour type SIMPLE -->
+                    <div id="simple-answer" class="answer-display simple">
+                        <h3>Réponse :</h3>
+                        <div id="simple-answer-text" class="answer-text"></div>
+                    </div>
+
+                    <!-- Affichage pour type QCM -->
+                    <div id="qcm-answer" class="answer-display qcm hidden">
+                        <div id="propositions-container" class="propositions-grid"></div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="navigation">
+                    <button onclick="previousQuestion()" class="btn-nav">
+                        <i class="fas fa-chevron-left"></i> Précédente
+                    </button>
+                    <button onclick="nextQuestion()" class="btn-nav">
+                        Suivante <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Section Timer -->
+            <section class="section">
+                <h2><i class="fas fa-clock"></i> Timer</h2>
+
+                <div class="timer-display">
+                    <div id="timer-visual" class="timer-circle">
+                        <span id="timer-text">30</span>
+                    </div>
+                    <div class="timer-controls">
+                        <button onclick="startTimer()" class="btn-timer btn-start">
+                            <i class="fas fa-play"></i> Lancer le Timer
+                        </button>
+                        <button onclick="stopTimer()" class="btn-timer btn-stop">
+                            <i class="fas fa-stop"></i> Arrêter
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Équipes -->
+            <section class="section">
+                <h2><i class="fas fa-users"></i> Gestion des Équipes</h2>
+
+                <div class="teams-container">
+                    <div class="team-card">
+                        <h3 class="team-name blue">Équipe Bleue</h3>
+                        <div class="team-points">
+                            <span id="blue-points" class="points-display">0</span>
+                            <div class="points-controls">
+                                <button onclick="updatePoints(1, 1)" class="btn-point btn-add">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button onclick="updatePoints(1, -1)" class="btn-point btn-remove">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="team-card">
+                        <h3 class="team-name yellow">Équipe Jaune</h3>
+                        <div class="team-points">
+                            <span id="yellow-points" class="points-display">0</span>
+                            <div class="points-controls">
+                                <button onclick="updatePoints(2, 1)" class="btn-point btn-add">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button onclick="updatePoints(2, -1)" class="btn-point btn-remove">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Contrôles -->
+            <section class="section">
+                <h2><i class="fas fa-gamepad"></i> Contrôles</h2>
+
+                <div class="control-buttons">
+                    <button onclick="resetTimer()" class="btn-control btn-reset">
+                        <i class="fas fa-redo"></i> Réinitialiser
+                    </button>
+                    <button onclick="loadQuestions()" class="btn-control btn-reload">
+                        <i class="fas fa-sync"></i> Recharger Questions
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+
+</html>
